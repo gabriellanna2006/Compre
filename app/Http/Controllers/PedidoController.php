@@ -41,9 +41,19 @@ class PedidoController extends Controller
         return response()->json($pedido, 200);
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
-        Pedido::findOrFail($id)->delete();
+        $pedido = Pedido::findOrFail($id);
+
+        if ($pedido->user_id != $request->user()->id) {
+
+            return response()->json([
+                'message' => 'Você não pode deletar este pedido'
+            ], 403);
+
+        }
+
+        $pedido->delete();
 
         return response()->json([
             'message' => 'Pedido deletado com sucesso'
